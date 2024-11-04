@@ -1,12 +1,13 @@
+inputs:
 {
   config,
   lib,
-  geosite,
   ...
 }:
 let
   cfg = config.rotix.mosdns;
   inherit (lib) mkIf;
+  inherit (inputs) geosite;
 in
 {
   config = {

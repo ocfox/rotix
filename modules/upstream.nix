@@ -6,14 +6,15 @@
 let
   cfg = config.rotix;
   inherit (lib) mkIf;
+  inherit (cfg.interfaces) pppoe onu;
 in
 {
   config = {
     systemd.network = {
 
-      networks."${cfg.interface.onu}" = {
+      networks."${onu}" = {
         # ONU上联接口 / 仅用于管理ONU
-        name = cfg.interface.onu;
+        name = onu;
         networkConfig.DHCP = "yes";
         dhcpV4Config = {
           UseRoutes = false;
@@ -22,8 +23,8 @@ in
         dhcpV6Config.WithoutRA = mkIf (cfg.onlineMode == "dhcp") "solicit";
       };
 
-      networks."${cfg.interface.pppoe}" = mkIf cfg.pppoe.enable {
-        name = cfg.interface.pppoe;
+      networks."${pppoe}" = mkIf cfg.pppoe.enable {
+        name = pppoe;
         networkConfig = {
           DHCP = "ipv6"; # 需要先接收到包含 M Flag 的 RA 才会尝试 DHCP-PD
           KeepConfiguration = "static"; # 防止清除 PPPD 通过 IPCP 获取的 IPV4 地址
@@ -51,7 +52,7 @@ in
           name "${cfg.pppoe.username}"
           password "${cfg.pppoe.password}"
 
-          ifname ${cfg.interface.pppoe}
+          ifname ${pppoe}
 
           usepeerdns
           defaultroute  # v4默认路由

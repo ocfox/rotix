@@ -15,7 +15,7 @@ in
       enable = true;
       settings =
         let
-          inherit (config.rotix.interface) br-lan;
+          inherit (config.rotix.interfaces) br-lan;
         in
         {
           server = if cfg.mosdns.enable then [ "127.0.0.53" ] else cfg.dns;

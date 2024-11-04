@@ -1,3 +1,4 @@
+inputs:
 {
   lib,
   config,
@@ -15,7 +16,13 @@ let
 in
 {
   imports = [
-    ./modules
+    ./modules/dae.nix
+    ./modules/lan.nix
+    ./modules/dnsmasq.nix
+    ./modules/nftables.nix
+    ./modules/upstream.nix
+    ./modules/mosdns-module.nix
+    (import ./modules/mosdns.nix inputs)
   ];
 
   options.rotix = {
@@ -47,6 +54,11 @@ in
       br-lan = mkOption {
         type = types.str;
         default = "br-lan";
+      };
+
+      direct = mkOption {
+        type = types.str;
+        default = "direct";
       };
 
       onu = mkOption {
@@ -89,7 +101,7 @@ in
     };
 
     pppoe = {
-      enable = cfg.onlineMode == "pppoe";
+      enable = mkEnableOption "pppoe online";
       interface = mkOption {
         type = types.str;
         default = cfg.interfaces.upstream;
@@ -112,5 +124,7 @@ in
 
   config = mkIf cfg.enable {
     rotix.mosdns.enable = mkDefault true;
+    networking.useNetworkd = true;
+    rotix.pppoe.enable = mkIf (cfg.onlineMode == "pppoe") true;
   };
 }
