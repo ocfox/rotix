@@ -44,7 +44,6 @@ in
             "set:${br-lan},10.0.1.0,10.0.254.255" # Reserve 10.0.0.0/24 & 10.0.255.0/24
             "set:${br-lan},::fff,::ffff,constructor:${br-lan},ra-names"
           ];
-          read-ethers = true;
         };
     };
   };
