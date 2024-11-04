@@ -103,57 +103,10 @@ in
 
               oifname ${wan} accept
               iifname ${wan} oifname vmap { ${lan} : jump weak_security_zone }
-
-              # The rest is dropped by the above policy
-            }
-          '';
-        };
-        nat = {
-          family = "inet";
-          content = ''
-            chain postrouting {
-              type nat hook postrouting priority srcnat; policy accept;
-
-              # full-cone nat local address
-              ip saddr 10.0.0.0/8 ip daddr != 10.0.0.0/8 fullcone
-
-              # full-cone nat ula addresses
-              ip6 saddr fc00::/7 ip6 daddr != fc00::/7 fullcone
-            }
-
-            chain prerouting {
-              type nat hook prerouting priority dstnat; policy accept;
-              fullcone
             }
           '';
         };
       };
     };
-
-    nixpkgs.overlays = [
-      (final: prev: {
-        nftables = prev.nftables.overrideAttrs (
-          oldAttrs: with prev; {
-            patches = oldAttrs.patches or [ ] ++ [
-              (fetchurl {
-                url = "https://raw.githubusercontent.com/debiansid/nftables-fullcone/vyos/1.1.0-1/0001-nftables-add-fullcone-expression-support.patch";
-                hash = "sha256-CK1IDb/CrYMSXm52wj6k7CjJ1fZvupzxvDaRCBbOmVU=";
-              })
-            ];
-          }
-        );
-        libnftnl = prev.libnftnl.overrideAttrs (
-          oldAttrs: with prev; {
-            nativeBuildInputs = (oldAttrs.nativeBuildInputs or [ ]) ++ [ autoreconfHook ];
-            patches = oldAttrs.patches or [ ] ++ [
-              (fetchurl {
-                url = "https://raw.githubusercontent.com/debiansid/libnftnl-fullcone/vyos/1.2.7-1/0001-add-fullcone-expression-support.patch";
-                hash = "sha256-IQVaF3pg+c3omH82gDGa85VgqqYDwHMccDFCMUu1+rU=";
-              })
-            ];
-          }
-        );
-      })
-    ];
   };
 }
