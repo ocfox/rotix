@@ -26,7 +26,6 @@ in
             br-lan
           ];
           bind-dynamic = true;
-          interface-name = "${br-lan}";
           # Cache
           cache-size = 8192;
           # Pervent reverse DNS lookups for local hosts
